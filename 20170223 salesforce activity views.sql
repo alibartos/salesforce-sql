@@ -30,7 +30,7 @@ id activity_id
 ,zeroifnull(case when QUALIFICATIONS_CHECKBOX_DEL_C = 'true' then 1 else 0 end) qualifications_checkbox
 ,subject
 
-from fivetran_db.salesforce.task
+from prod_saj_share.salesforce.task
 
 where is_deleted = 'false'
 
@@ -64,7 +64,7 @@ id activity_id
 ,zeroifnull(case when QUALIFICATIONS_CHECKBOX_DEL_C = 'true' then 1 else 0 end) qualifications_checkbox
 ,subject
 
-from fivetran_db.salesforce.event
+from prod_saj_share.salesforce.event
 
 where is_deleted = 'false'
 
@@ -82,7 +82,7 @@ activity_id
 ,opportunity_id
 ,activity_type
 --,coalesce(completed_date, cast(created_date_ts as date)) completed_date
-,coalesce(completed_date, (date_trunc('DAY',to_timestamp(created_date_ts)))::date completed_date
+,coalesce(completed_date, (date_trunc('DAY',to_timestamp(created_date_ts)))::date) completed_date
 ,coalesce(completed_date_ts, created_date_ts) completed_date_ts
 ,type
 ,sub_type
@@ -112,7 +112,7 @@ activity_id
 ,opportunity_id
 ,'Meeting Set' activity_type
 --,coalesce(completed_date, cast(created_date_ts as date)) completed_date
-,coalesce(completed_date, (date_trunc('DAY',to_timestamp(created_date_ts)))::date completed_date
+,coalesce(completed_date, (date_trunc('DAY',to_timestamp(created_date_ts)))::date) completed_date
 ,coalesce(completed_date_ts, created_date_ts) completed_date_ts
 ,type
 ,sub_type
@@ -131,6 +131,7 @@ and activity_type = 'Event' and meeting_checkbox = 1
 ;
 
 select * from prod_saj_share.work_revopt.salesforce_completed_activity limit 100;
+
 
 
 
