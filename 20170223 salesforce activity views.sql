@@ -1,4 +1,4 @@
-create view prod_db.work.salesforce_activity as (
+create view prod_saj_share.work_revopt.salesforce_activity as (
 
 select
 id activity_id
@@ -71,8 +71,8 @@ where is_deleted = 'false'
 );
 
 
-drop view prod_db.work.salesforce_completed_activity;
-create view prod_db.work.salesforce_completed_activity as ( 
+drop view prod_saj_share.work_revopt.salesforce_completed_activity;
+create view prod_saj_share.work_revopt.salesforce_completed_activity as ( 
 select
 activity_id
 ,owner_id person_id
@@ -93,7 +93,7 @@ activity_id
 ,meeting_checkbox
 ,qualifications_checkbox
 
-from prod_db.work.salesforce_activity 
+from prod_saj_share.work_revopt.salesforce_activity 
 
 where activity_date <= current_date
 and (
@@ -123,14 +123,15 @@ activity_id
 ,meeting_checkbox
 ,qualifications_checkbox
 
-from prod_db.work.salesforce_activity 
+from prod_saj_share.work_revopt.salesforce_activity 
 
 where activity_date <= current_date
 and activity_type = 'Event' and meeting_checkbox = 1
 )
 ;
 
-select * from prod_db.work.salesforce_completed_activity limit 100;
+select * from prod_saj_share.work_revopt.salesforce_completed_activity limit 100;
+
 
 
 
