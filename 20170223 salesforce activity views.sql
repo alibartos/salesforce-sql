@@ -47,7 +47,7 @@ id activity_id
 ,activity_date_time::timestamp activity_date_ts
 ,case when MEETING_CHECKBOX_C = 'true' then activity_date
         --else cast(completed_date_time_c as date) end completed_date
-        else (date_trunc('DAY',to_timestamp(completed_date_time_c)))::date end completed date
+        else (date_trunc('DAY',to_timestamp(completed_date_time_c)))::date end completed_date
 ,case when MEETING_CHECKBOX_C = 'true' then activity_date_time
         else completed_date_time_c end completed_date_ts
 ,account_id 
