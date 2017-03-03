@@ -9,7 +9,8 @@ id activity_id
 ,created_date created_date_ts
 ,activity_date
 ,cast(activity_date as timestamp) activity_date_ts
-,cast(completed_date_time_c as date) completed_date
+--,cast(completed_date_time_c as date) completed_date
+,(date_trunc('DAY',to_timestamp(completed_date_time_c)))::date completed_date
 ,completed_date_time_c completed_date_ts
 ,account_id 
 ,case when left(who_id, 3) = '00Q' then who_id else null end lead_id
@@ -45,7 +46,8 @@ id activity_id
 ,activity_date
 ,activity_date_time::timestamp activity_date_ts
 ,case when MEETING_CHECKBOX_C = 'true' then activity_date
-        else cast(completed_date_time_c as date) end completed_date
+        --else cast(completed_date_time_c as date) end completed_date
+        else (date_trunc('DAY',to_timestamp(completed_date_time_c)))::date end completed date
 ,case when MEETING_CHECKBOX_C = 'true' then activity_date_time
         else completed_date_time_c end completed_date_ts
 ,account_id 
@@ -79,7 +81,8 @@ activity_id
 ,contact_id
 ,opportunity_id
 ,activity_type
-,coalesce(completed_date, cast(created_date_ts as date)) completed_date
+--,coalesce(completed_date, cast(created_date_ts as date)) completed_date
+,coalesce(completed_date, (date_trunc('DAY',to_timestamp(created_date_ts)))::date completed_date
 ,coalesce(completed_date_ts, created_date_ts) completed_date_ts
 ,type
 ,sub_type
@@ -108,7 +111,8 @@ activity_id
 ,contact_id
 ,opportunity_id
 ,'Meeting Set' activity_type
-,coalesce(completed_date, cast(created_date_ts as date)) completed_date
+--,coalesce(completed_date, cast(created_date_ts as date)) completed_date
+,coalesce(completed_date, (date_trunc('DAY',to_timestamp(created_date_ts)))::date completed_date
 ,coalesce(completed_date_ts, created_date_ts) completed_date_ts
 ,type
 ,sub_type
