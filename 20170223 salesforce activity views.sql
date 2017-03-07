@@ -1,5 +1,5 @@
 create view prod_saj_share.work_revopt.salesforce_activity as (
-test
+
 select
 id activity_id
 ,'Task' as activity_type
