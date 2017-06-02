@@ -1,0 +1,51 @@
+/*
+
+Bartos
+Created: 20170602
+Updated: 20170602
+
+SALESFORCE USER DETAIL VIEW REVISED
+        
+*/
+
+drop view work_revopt.salesforce_user_detail;
+
+ CREATE VIEW prod_saj_share.work_revopt.salesforce_user_detail AS (
+        SELECT DISTINCT ue.id AS id
+                ,e.employee_id AS NS_employee_id
+                ,ue.ns_internal_id_c AS SF_ns_internal_id_c
+                ,e.full_name AS name
+                ,ue.name AS SF_name
+                ,e.first_name
+                ,e.last_name
+                ,e.department_full_name AS NS_department_full_name
+                ,ue.snagajob_dept_c AS SF_snagajob_dept_c
+                ,replace(split_part(e.department_full_name,' : ', 2), 'Executives') sales_parent_department
+                ,split_part(e.department_full_name,' : ', 3) sales_department
+                ,split_part(e.department_full_name,' : ', 4) sales_team
+                ,e.job_title
+                ,ur.rollup_description role
+                ,ue.username
+                ,ue.email
+                ,e.is_inactive
+                ,ue.user_role_id
+                ,ue.last_login_date
+                ,ue.created_date
+                ,ue.offboard_date_c
+                ,um.name AS manager_name
+                ,um.id AS manager_id
+                ,CASE WHEN ue.snagajob_dept_c = e.department_full_name THEN 'Y' ELSE 'N' END AS NS_SF_match
+        FROM netsuite.employees_view e
+        LEFT JOIN netsuite.employees_view em ON e.supervisor_employee_id = em.employee_id
+        LEFT JOIN salesforce.user ue ON e.full_name::varchar = ue.name::varchar OR e.employee_id::varchar = ue.ns_internal_id_c::varchar
+        LEFT JOIN salesforce.user um ON em.employee_id::varchar = um.ns_internal_id_c::varchar
+        LEFT JOIN salesforce.user_role ur ON ue.user_role_id = ur.id
+        )
+        
+        SELECT * FROM work_revopt.salesforce_user_detail
+        
+--Grant Looker access to this view:        
+        GRANT SELECT ON TABLE work_revopt.salesforce_user_detail TO ROLE dbreader
+        
+      
+        
