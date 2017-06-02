@@ -1,0 +1,25 @@
+        SELECT u.name
+                ,u.ns_department_full_name
+                ,u.job_title
+                ,u.role
+                ,tcr.year_quarter opp_created_quarter
+                ,tcl.year_quarter opp_close_quarter
+                ,a.name customer
+                ,a.id account_id
+                ,o.name opp_name
+                ,o.id opp_id
+                ,o.stage_name
+                ,o.created_date
+                ,to_timestamp(close_date) close_date
+                ,o.forecast_amount_c
+        FROM prod_saj_share.salesforce.opportunity o
+        JOIN prod_saj_share.work_revopt.salesforce_user_detail u on o.owner_id = u.id
+        LEFT JOIN dbo.dw_dm_time_day tcl ON o.close_date = tcl.date::date
+        LEFT JOIN dbo.dw_dm_time_day tcr ON o.created_date::date = tcr.date::date
+        LEFT JOIN (SELECT DISTINCT id, name FROM prod_saj_share.salesforce.account) a ON o.account_id = a.id
+        WHERE 1=1
+                AND ns_department_full_name LIKE '%Mid Market: SaaS : 252%'
+                AND u.name NOT LIKE '%Unassigned%'
+                AND o.close_date BETWEEN dateadd(day,1,last_day(dateadd(year,-1,current_date),year)) AND last_day(current_date,year) --close date must be within the current year
+                AND o.is_deleted = 'False'
+        ORDER BY 2 DESC
