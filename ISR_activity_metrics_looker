@@ -16,12 +16,12 @@
 
 ---------------------------------------------------------------------ISR ACTIVITY METRICS---------------------------------------------------------------------          
 
-        SELECT ac.name account_name
+SELECT ac.name account_name
                 ,a.*
                 ,(date_trunc('DAY',to_timestamp(a.completed_date_ts)))::date completed_date
         FROM (
                 SELECT DISTINCT a.account_id account_id
-                        ,u.role
+                        ,u.ns_department_full_name
                         ,u.name rep_name
                         ,CASE WHEN a.created_by_id = u.id THEN 'Created' WHEN a.owner_id = u.id THEN 'Owned' END AS Created_or_Owned
                         ,a.activity_id
@@ -31,15 +31,15 @@
                         ,a.completed_date_ts
                         ,a.subject
                 FROM prod_saj_share.work_revopt.salesforce_activity a
-                JOIN prod_saj_share.work_revopt.ISR_team_current u ON a.owner_id = u.id
-                WHERE role LIKE '%Activation%' AND a.sub_type LIKE '%Presentation%' AND a.sub_type <> 'Presentation - Telecon' AND a.meeting_checkbox = 1
-        
+                JOIN prod_saj_share.work_revopt.salesforce_user_detail u ON a.owner_id = u.id
+                WHERE ns_department_full_name = 'Sales : 250 - SaaS : 290 - Mid Market: SaaS : 274 - MM: SaaS: Activation' AND a.sub_type LIKE '%Presentation%' AND a.sub_type <> 'Presentation - Telecon' AND a.meeting_checkbox = 1
+
                 UNION
-            
+
                 SELECT a.*
-                FROM ( 
+                FROM (
                         SELECT DISTINCT a.account_id account_id
-                                ,u.role
+                                ,u.ns_department_full_name
                                 ,u.name rep_name
                                 ,'Created' AS Created_or_Owned
                                 ,a.activity_id
@@ -49,13 +49,13 @@
                                 ,a.completed_date_ts
                                 ,a.subject
                         FROM prod_saj_share.work_revopt.salesforce_completed_activity a
-                        JOIN prod_saj_share.work_revopt.ISR_team_current u on a.person_id = u.id
-                        WHERE role = '263 - Mid Market: Saas: ISR' AND a.activity_type = 'Meeting Set' AND a.sub_type LIKE '%Presentation%' AND a.sub_type <> 'Presentation - Telecon'
-                        
+                        JOIN prod_saj_share.work_revopt.salesforce_user_detail u on a.person_id = u.id
+                        WHERE u.ns_department_full_name = 'Sales : 250 - SaaS : 290 - Mid Market: SaaS : 263 - Mid Market: Saas: ISR' AND a.activity_type = 'Meeting Set' AND a.sub_type LIKE '%Presentation%' AND a.sub_type <> 'Presentation - Telecon'
+
                         UNION
-                
+
                         SELECT DISTINCT a.account_id account_id
-                                ,u.role
+                                ,u.ns_department_full_name
                                 ,u.name rep_name
                                 ,CASE WHEN a.created_by_id = u.id THEN 'Created' WHEN a.owner_id = u.id THEN 'Owned' END AS Created_or_Owned
                                 ,a.activity_id
@@ -65,13 +65,13 @@
                                 ,a.completed_date_ts
                                 ,a.subject
                         FROM prod_saj_share.work_revopt.salesforce_activity a
-                        JOIN prod_saj_share.work_revopt.ISR_team_current u on a.created_by_id = u.id OR a.owner_id = u.id --meetings
-                        WHERE u.role = '264 - Enterprise: SaaS: ISR' AND a.activity_type = 'Event' AND (a.sub_type LIKE '%Presentation%') AND (a.sub_type <> 'Presentation - Telecon') AND a.meeting_checkbox = 1
-                        
+                        JOIN prod_saj_share.work_revopt.salesforce_user_detail u on a.created_by_id = u.id OR a.owner_id = u.id --meetings
+                        WHERE ns_department_full_name = 'Sales : 250 - SaaS : 295 - Enterprise: SaaS : 264 - Enterprise: SaaS: ISR' AND a.activity_type = 'Event' AND (a.sub_type LIKE '%Presentation%') AND (a.sub_type <> 'Presentation - Telecon') AND a.meeting_checkbox = 1
+
                         UNION
-                        
+
                         SELECT DISTINCT a.account_id account_id
-                                ,u.role
+                                ,u.ns_department_full_name
                                 ,u.name rep_name
                                 ,CASE WHEN a.created_by_id = u.id THEN 'Created'
                                         WHEN a.owner_id = u.id THEN 'Owned'
@@ -83,15 +83,17 @@
                                 ,a.completed_date_ts
                                 ,a.subject
                         FROM prod_saj_share.work_revopt.salesforce_activity a
-                        JOIN prod_saj_share.work_revopt.ISR_team_current u on a.owner_id = u.id --all other activities
-                        WHERE u.role = '264 - Enterprise: SaaS: ISR' AND a.type IN ('Call','Other','Closing Call','Email','Webinar','InMail') AND completed_task = 1
+                        JOIN prod_saj_share.work_revopt.salesforce_user_detail u on a.owner_id = u.id --all other activities
+                        WHERE ns_department_full_name = 'Sales : 250 - SaaS : 295 - Enterprise: SaaS : 264 - Enterprise: SaaS: ISR' AND a.type IN ('Call','Other','Closing Call','Email','Webinar','InMail') AND completed_task = 1
                 ) a
                 LEFT JOIN (
                         SELECT DISTINCT a.activity_id
                         FROM prod_saj_share.work_revopt.salesforce_activity a
+                        LEFT JOIN work_revopt.salesforce_account_overview sfo ON a.account_id = sfo.account_id
                         WHERE sub_type LIKE '%Presentation%' AND sub_type <> 'Presentation - Telecon' AND meeting_checkbox = 1
-                                AND a.owner_id IN (SELECT id FROM prod_saj_share.work_revopt.ISR_team_current WHERE role = '274 - MM: SaaS: Activation')
-                                AND a.created_by_id IN (SELECT id FROM prod_saj_share.work_revopt.ISR_team_current WHERE role IN ('263 - Mid Market: Saas: ISR', '264 - Enterprise: SaaS: ISR'))                
+                                AND a.owner_id IN (SELECT id FROM prod_saj_share.work_revopt.salesforce_user_detail u WHERE ns_department_full_name = 'Sales : 250 - SaaS : 290 - Mid Market: SaaS : 274 - MM: SaaS: Activation')
+                                AND a.created_by_id IN (SELECT id FROM prod_saj_share.work_revopt.salesforce_user_detail u WHERE ns_department_full_name IN ('Sales : 250 - SaaS : 290 - Mid Market: SaaS : 263 - Mid Market: Saas: ISR', 'Sales : 250 - SaaS : 295 - Enterprise: SaaS : 264 - Enterprise: SaaS: ISR'))
+                                AND (sfo.brand_name IS NULL or sfo.brand_name = 'Unknown Brand') --exclude meetings they set for NON brand accounts
                         ) ex ON a.activity_id = ex.activity_id
                 WHERE ex.activity_id IS NULL
         ) a
@@ -101,11 +103,11 @@
                 FROM prod_saj_share.work_revopt.salesforce_activity a
                 WHERE activity_type = 'Event' AND type = 'Meeting' AND (sub_type LIKE '%Presentation%') AND (sub_type <> 'Presentation - Telecon') AND meeting_checkbox = 1
         ) g ON a.activity_id = g.activity_id
-        WHERE 1=1                      
-                AND g.activity_id IS NULL  
-                AND (date_trunc('DAY',to_timestamp(a.completed_date_ts)))::date >= '20170101' --BETWEEN '20170301' AND '20170331'      
+        WHERE 1=1
+                AND g.activity_id IS NULL
+                AND (date_trunc('DAY',to_timestamp(a.completed_date_ts)))::date >= '20170101' --BETWEEN '20170301' AND '20170331'
         ORDER BY 1 ASC, 2 DESC
-
+        
 
 --Grant Looker access to this view:        
         GRANT SELECT ON TABLE prod_saj_share.work_revopt.ISR_team_current TO ROLE dbreader
