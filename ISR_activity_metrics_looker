@@ -89,7 +89,7 @@ SELECT ac.name account_name
                 LEFT JOIN (
                         SELECT DISTINCT a.activity_id
                         FROM prod_saj_share.work_revopt.salesforce_activity a
-                        LEFT JOIN work_revopt.salesforce_account_overview sfo ON a.account_id = sfo.account_id
+                        LEFT JOIN prod_saj_share.work_revopt.salesforce_account_overview sfo ON a.account_id = sfo.account_id
                         WHERE sub_type LIKE '%Presentation%' AND sub_type <> 'Presentation - Telecon' AND meeting_checkbox = 1
                                 AND a.owner_id IN (SELECT id FROM prod_saj_share.work_revopt.salesforce_user_detail u WHERE ns_department_full_name = 'Sales : 250 - SaaS : 290 - Mid Market: SaaS : 274 - MM: SaaS: Activation')
                                 AND a.created_by_id IN (SELECT id FROM prod_saj_share.work_revopt.salesforce_user_detail u WHERE ns_department_full_name IN ('Sales : 250 - SaaS : 290 - Mid Market: SaaS : 263 - Mid Market: Saas: ISR', 'Sales : 250 - SaaS : 295 - Enterprise: SaaS : 264 - Enterprise: SaaS: ISR'))
