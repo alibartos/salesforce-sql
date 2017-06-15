@@ -30,7 +30,8 @@ id activity_id
 ,zeroifnull(case when QUALIFICATIONS_CHECKBOX_DEL_C = 'true' then 1 else 0 end) qualifications_checkbox
 ,subject
 
-from salesforce.task
+--from salesforce.task
+from fivetran_db.prod_salesforce.task
 
 where is_deleted = 'false'
 
@@ -63,7 +64,8 @@ id activity_id
 ,zeroifnull(case when QUALIFICATIONS_CHECKBOX_DEL_C = 'true' then 1 else 0 end) qualifications_checkbox
 ,subject
 
-from salesforce.event
+--from salesforce.event
+from fivetran_db.prod_salesforce.event
 
 where is_deleted = 'false'
 
