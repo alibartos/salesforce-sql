@@ -1,3 +1,6 @@
+
+--Last Modified: 20170615 - changing views to Fivetran tables for hourly refresh!
+
 drop view work_revopt.salesforce_activity;
 create view work_revopt.salesforce_activity as (
 
@@ -19,11 +22,16 @@ id activity_id
 ,type
 ,task_subtype sub_type
 ,case when subject like '%Email: >>%' then 'OB' 
-          when subject like '%[Email]%[Out]%' then 'OB'
+          when subject like '%[Out]%' then 'OB'
     when subject like '%Email: <<%' then 'IB'
-    when subject like '%[Email]%[In]%' then 'IB'
+    when subject like '%[In]%' then 'IB'
     else 'NA' end email_direction
-,case when lower(subject) like '%outreach%' then 1 else 0 end outreach_flag
+    
+,case when lower(subject) like '%outreach%' then 1 else 0 end outreach_flag --basic old Outreach flag (for all Outreach use)
+--,case when lower(subject) like '%outreach gmail%' then 1 else 0 end outreach_gmail_flag --one off emails sent through Outreach plugin through Gmail
+--,case when lower(subject) like '%outreach%' and lower(subject) like '%mktg%' then 1 else 0 end outreach_mkting_flag --marketing Outreach sequences
+--,case when lower(subject) like '%outreach%' and lower(subject) not like '%mktg%' and lower(subject) not like '%gmail%' then 1 else 0 end outreach_rep_seq_flag --marketing Outreach sequences
+
 ,case when lower(subject) like '%email: << %' or lower(subject) like '%email: >> %' then 1 else 0 end groove_flag  
 ,case when is_closed = 'true' then 1 else 0 end completed_task
 ,zeroifnull(case when MEETING_CHECKBOX_C = 'true' then 1 else 0 end) meeting_checkbox
